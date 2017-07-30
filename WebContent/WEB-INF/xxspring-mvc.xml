@@ -1,0 +1,87 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+ http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+ http://www.springframework.org/schema/tx
+ http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+ http://www.springframework.org/schema/task
+ http://www.springframework.org/schema/task/spring-task-3.1.xsd      
+ http://www.springframework.org/schema/context
+ http://www.springframework.org/schema/context/spring-context.xsd
+ http://www.springframework.org/schema/mvc      
+ http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+ http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<!-- 使用注解方式实现,视图层和控制层之间的映射 -->
+	<!-- 启动包扫描功能，以便扫描带有@Controller、@Service、@repository、@Component等注解的类成为spring的bean -->
+	<!-- springmvc自动扫描指定的包com.xx,use-default-filters="false"时只扫描com.xx包下带有@Controller注解的类 -->
+	<!-- <context:component-scan base-package="com.ssh" use-default-filters="false"> 
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/> 
+		</context:component-scan> -->
+
+	<!--默认注解映射的支持 -->
+	<mvc:annotation-driven />
+
+
+	<!--自动扫描目录下所有的类文件 -->
+
+	<!-- <context:component-scan base-package="com.ivp.xch.figure.controller" 
+		> </context:component-scan> -->
+
+	<!-- <context:component-scan base-package="com.ivp.xch.figure.controller" 
+		use-default-filters="false"> -->
+	<!-- <context:exclude-filter type="regex" expression="com.ivp.xch.*.*.controller"/> -->
+	<!-- <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/> -->
+	<!-- </context:component-scan> -->
+
+
+	<!-- <context:component-scan base-package = "com.host.app.web.controller" 
+		> <context:exclude-filter type = "annotation" expression = "org.springframework.stereotype.Service" 
+		/> </context:component-scan > -->
+
+	<!-- 使用注解方式实现,视图层和控制层之间的映射 -->
+	<!-- 启动包扫描功能，以便扫描带有@Controller、@Service、@repository、@Component等注解的类成为spring的bean -->
+	<!-- springmvc自动扫描指定的包com.xx,use-default-filters="false"时只扫描com.xx包下带有@Controller注解的类 -->
+	<context:component-scan base-package="com.ivp.xch"
+		use-default-filters="false">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<!-- <beans:bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"> 
+		</beans:bean> <beans:bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"> 
+		</beans:bean> <beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
+		</beans:bean> <beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
+		<beans:property name="prefix" value="/" /> <beans:property name="suffix" 
+		value=".html" /> </beans:bean> -->
+
+
+	<!-- jsp视图解析器 -->
+	<!-- <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 
+		<property name="prefix" value="/WEB-INF/"/> <property name="suffix" value=".jsp"/> 
+		</bean> -->
+
+
+
+	<!-- Freemarker配置 <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer"> 
+		<property name="templateLoaderPath" > <value>/WEB-INF/</value> </property> 
+		<property name="freemarkerSettings"> <props> <prop key="template_update_delay">0</prop> 
+		<prop key="default_encoding">UTF-8</prop> <prop key="number_format">0.###</prop> 
+		<prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop> <prop key="classic_compatible">true</prop> 
+		<prop key="template_exception_handler">ignore</prop> </props> </property> 
+		</bean> -->
+
+
+	<!-- Freemarker视图解析器 <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver"> 
+		<property name="cache" value="true" /> <property name="suffix" value=".ftl" 
+		/> <property name="contentType" value="text/html;charset=UTF-8"></property> 
+		<property name="requestContextAttribute" value="request" /> <property name="exposeSpringMacroHelpers" 
+		value="true" /> 请求和会话属性都被复制到模板的属性集中，可以使用FreeMarker的表达式语言来访问并显示 <property 
+		name="exposeRequestAttributes" value="true" /> <property name="exposeSessionAttributes" 
+		value="true" /> </bean> -->
+
+</beans>

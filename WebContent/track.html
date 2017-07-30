@@ -1,0 +1,301 @@
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>行驶轨迹</title>
+<style type="text/css">
+body, html {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	font-family: "微软雅黑";
+}
+
+#map_canvas {
+	width: 100%;
+	height: 100%;
+}
+
+/* #result { */
+/* 	width: 100% */
+/* } */
+.topbar {
+	width: 100%;
+	position: absolute;
+	top: 1px;
+	font-weight: bold;
+	padding: 4px 6px;
+	color: #fff;
+	background-color: #404040;
+}
+
+.dialog {
+	width: 200px;
+	/* height: 200px ;*/
+	left: 20px;
+	top: 50px;
+	position: absolute;
+	filter: Alpha(Opacity = 10, Style = 0);
+	background-color: #ccc;
+	-webkit-box-shadow: 1px 1px 3px #669999;
+	-moz-box-shadow: 1px 1px 3px #669999;
+	box-shadow: 1px 1px 3px #669999;
+	margin: 10px;
+}
+
+.dialog-title {
+	color: #fff;
+	background-color: #0066cc;
+	font-size: 10pt;
+	font-weight: bold;
+	padding: 4px 6px;
+	cursor: move;
+}
+
+.dialog-content {
+	padding: 4px;
+	font-size: 10pt;
+}
+
+table, th, td {
+	border: 0px;
+	font-size: 10pt;
+}
+
+.tborder {
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: rgb(170, 170, 170);
+	border-right-color: rgb(170, 170, 170);
+	border-bottom-color: rgb(170, 170, 170);
+	border-left-color: rgb(170, 170, 170);
+	border-image-source: none;
+	border-image-slice: 100% 100% 100% 100%;
+	border-image-width: 1 1 1 1;
+	border-image-outset: 0 0 0 0;
+	border-image-repeat: stretch stretch;
+}
+</style>
+<script
+	src="http://api.map.baidu.com/api?v=2.0&ak=w4jjVdCNVqisMu2n8NTVFXEne0d8BXZg"></script>
+<script type="text/javascript" src="resources/bdmap/lushu.js"></script>
+<script src="resources/d3/d3.js"></script>
+
+</head>
+<body>
+	<button id="run">开始</button>
+	<button id="stop">停止</button>
+	<button id="pause">暂停</button>
+	<!-- 	<button id="hide">隐藏信息窗口</button>
+	<button id="show">展示信息窗口</button> -->
+	<div id="map_canvas"></div>
+	<!-- 	<div id="result"></div> -->
+
+	<div id="dlgTest" class="dialog">
+		<div class="dialog-title">车队信息</div>
+		<div class="dialog-content" style="height: 100px;">
+			<table>
+				<tr>
+					<th>车队名称</th>
+					<th>车队信息</th>
+				</tr>
+				<tr>
+					<td id='tmName'></td>
+					<td id='vName'></td>
+				</tr>
+
+			</table>
+		</div>
+		<div class="dialog-title">违规情况</div>
+		<div id='vproblm' class="dialog-content" style="height: 100px;">
+		</div>
+
+
+		<div class="dialog-title">赛段排名</div>
+		<div id='vscore' class="dialog-content" style="height: 100px;">
+		</div>
+
+
+		<div class="dialog-title">故障请求援助</div>
+		<div class="dialog-content" style="height: 50px;"></div>
+	</div>
+
+
+	<script>
+        var x = 120.7782533, y = 31.5914428;
+        var map = new BMap.Map('map_canvas');
+        map.enableScrollWheelZoom();
+        map.centerAndZoom(new BMap.Point(x, y), 17);
+        var lushu;
+        console.log('================== window.location ', window.location);
+
+        //  var qstr0 = window.location.search.split('?')[1];
+
+        /*   var qstr = qstr0.split('&');
+          var q1 = qstr[0].split('=')[1];
+          var q2 = qstr[1].split('=')[1]; */
+
+        /// console.log('=============q1  ', q1, q2);
+        d3.json("s/v/trk" + window.location.search, function(error, root) {
+            console.log('====== root ', root);
+
+            if (!root) {
+                return true;
+            }
+
+            var arrPois = [];
+
+            for (var i = 0, len = root.data.length; i < len; i++) {
+                var p = root.data[i];
+                arrPois.push(new BMap.Point(p[0] + 0.010995752930000435, p[1] + 0.0036989061340015894));
+            }
+
+            // console.log('================= arrPois ', arrPois);
+            map.setViewport(arrPois);
+
+            map.addOverlay(new BMap.Polyline(arrPois, {
+                strokeColor : 'blue'
+            }));
+
+            lushu = new BMapLib.LuShu(map, arrPois, {
+                defaultContent : "",//"从天安门到百度大厦"
+                autoView : true,//是否开启自动视野调整，如果开启那么路书在运动过程中会根据视野自动调整
+                icon : new BMap.Icon('http://lbsyun.baidu.com/jsdemo/img/car.png', new BMap.Size(52, 26), {
+                    anchor : new BMap.Size(27, 13)
+                }),
+                speed : 60,
+                enableRotation : true
+            //是否设置marker随着道路的走向进行旋转
+            });
+
+        });
+
+        var vehicleObj = {};
+        d3.json("s/tstv/s/id" + window.location.search, function(error, root) {
+            vehicleObj = root.data;
+            d3.select('#tmName').text(vehicleObj.teamName);
+            d3.select('#vName').text(vehicleObj.vName);
+        });
+
+        function $(element) {
+            return document.getElementById(element);
+        }
+
+        function callBk() {
+            // console.log('========= 哎呦  跑完了');
+            //查询  计算结果
+            //             d3.xhr("s/v/trk/result" + window.location.search).get(function(response) {
+            //                 //console.log('=============== result response ', response);
+            //             });
+
+            d3.json("s/v/trk/result" + window.location.search, function(error, root) {
+                var result = root.data;
+                d3.select('#vproblm').text(result[o].notes);
+                d3.select('#vscore').text('第一名：' + vehicleObj.vName);
+
+            });
+
+        }
+        //绑定事件
+        $("run").onclick = function() {
+            lushu.start(callBk);
+            // 发请求到后台 计算结果
+            //             d3.request(url).get(function(response) {
+            //             });
+            // console.log('============= d3.xhr ', d3.xhr);
+            //var qstr0 = window.location.search.split('?')[1];
+            //             var qstr = qstr0.split('&');
+            //             console.log('============== qstr', qstr);
+            //             var q1 = qstr[0].split('=');
+            //             var q2 = qstr[1].split('=');
+            //             console.log('============== q1', q1);
+            //             console.log('============== q2', q2);
+
+            //             var params = {};
+            //             params[q1[0]] = q1[1];
+            //             params[q2[0]] = q2[1];
+
+            // d3.xhr("s/v/trk/test").post(JSON.stringify(params), function(response) {
+            d3.xhr("s/v/trk/test" + window.location.search).get(function(response) {
+                //  console.log('=============== test response ', response);
+            });
+
+        }
+        $("stop").onclick = function() {
+            lushu.stop();
+        }
+        $("pause").onclick = function() {
+            lushu.pause();
+        }
+        //         $("hide").onclick = function() {
+        //             lushu.hideInfoWindow();
+        //         }
+        //         $("show").onclick = function() {
+        //             lushu.showInfoWindow();
+        //         }
+
+        var Dragging = function(validateHandler) { //参数为验证点击区域是否为可移动区域，如果是返回欲移动元素，负责返回null
+            var draggingObj = null; //dragging Dialog
+            var diffX = 0;
+            var diffY = 0;
+
+            function mouseHandler(e) {
+                switch (e.type) {
+                    case 'mousedown' :
+                        draggingObj = validateHandler(e);//验证是否为可点击移动区域
+                        if (draggingObj != null) {
+                            diffX = e.clientX - draggingObj.offsetLeft;
+                            diffY = e.clientY - draggingObj.offsetTop;
+                        }
+                        break;
+
+                    case 'mousemove' :
+                        if (draggingObj) {
+                            draggingObj.style.left = (e.clientX - diffX) + 'px';
+                            draggingObj.style.top = (e.clientY - diffY) + 'px';
+                        }
+                        break;
+
+                    case 'mouseup' :
+                        draggingObj = null;
+                        diffX = 0;
+                        diffY = 0;
+                        break;
+                }
+            };
+
+            return {
+                enable : function() {
+                    document.addEventListener('mousedown', mouseHandler);
+                    document.addEventListener('mousemove', mouseHandler);
+                    document.addEventListener('mouseup', mouseHandler);
+                },
+                disable : function() {
+                    document.removeEventListener('mousedown', mouseHandler);
+                    document.removeEventListener('mousemove', mouseHandler);
+                    document.removeEventListener('mouseup', mouseHandler);
+                }
+            }
+        }
+
+        function getDraggingDialog(e) {
+            var target = e.target;
+            while (target && target.className && target.className.indexOf('dialog-title') == -1) {
+                target = target.offsetParent;
+            }
+            if (target != null) {
+                return target.offsetParent;
+            } else {
+                return null;
+            }
+        }
+
+        Dragging(getDraggingDialog).enable();
+    </script>
+</body>
+</html>

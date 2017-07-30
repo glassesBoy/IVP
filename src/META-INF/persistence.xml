@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+	version="1.0">
+
+	<!-- RESOURCE_LOCAL代表本地事务 -->
+	<persistence-unit name="defaultPersistenceUnit" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<properties>
+			<!--mysql数据库连接的配置 -->
+			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
+			<property name="hibernate.connection.url"
+				value="jdbc:mysql://localhost:3306/springjpa?characterEncoding=UTF-8&amp;autoReconnect=true&amp;failOverReadOnly=false" />
+			<property name="hibernate.connection.username" value="root" />
+			<property name="hibernate.connection.password" value="root" />
+			<!--MySQL方言或 org.hibernate.dialect.MySQL5InnoDBDialect -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
+
+			<!--设置外连接抓取树的最大深度 -->
+			<property name="hibernate.max_fetch_depth" value="3" />
+
+			<!--是否显示执行的sql语句 -->
+			<property name="hibernate.show_sql" value="true" />
+			<!--输出格式化后的sql语句,更方便查看 -->
+			<property name="hibernate.format_sql" value="true" />
+			<property name="maxIdle" value="30" />
+			<property name="minIdle" value="2" />
+			<property name="maxWait" value="600000" />
+			<property name="testOnBorrow" value="true" />
+			<property name="testWhileIdle" value="true" />
+	<!-- 		<property name="validationQuery" value="SELECT 1" /> -->
+
+			<!--是否让hibernate自动生成数据库的建表语句 -->
+			<!--create-drop 运行时先创建表,结束后删除表 -->
+			<!--create 运行时先删除表再创建表 -->
+			<!--update 更新表的字段,不会更新表字段类型 -->
+			<!--validate 验证表和字段是否一样,数据库表里多了字段不会报错 -->
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+		</properties>
+	</persistence-unit>
+</persistence>
